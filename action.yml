@@ -1,0 +1,43 @@
+---
+name: "Generate Docker Tag"
+author: "Kenzi Stewart <kstewart@speareducation.com>"
+description: "Generates a docker image name and tag based on inputs"
+inputs:
+  git-ref:
+    description: "Value of ref to use (typically the GITHUB_REF environment variable)"
+    required: false
+  docker-registry:
+    description: "(optional) the name of the docker registry to use. Defaults to docker.io if not set."
+    required: false
+  docker-repository:
+    description: "The name of the docker repository to generate against"
+    required: true
+outputs:
+  image_tag:
+    description: "The image tag to build"
+    value: ""
+
+runs:
+  using: composite
+  steps:
+    - name: "Configure docker image tag"
+      shell: bash
+      run: |
+        DOCKER_IMAGE_VERSION=
+        RELEASE_VER=${GITHUB_REF}
+
+        if [[ "x${RELEASE_VER}" != "x" ]]; then
+          if [[ "x${RELEASE_VER}" == "xmain" ]]; then
+            DOCKER_IMAGE_VERSION=latest
+          else
+            DOCKER_IMAGE_VERSION=$(echo "${RELEASE_VER}" | sed -e 's%refs/heads/%%g' -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
+          fi
+        fi
+        DOCKER_IMAGE_VERSION=${DOCKER_IMAGE_VERSION:-dev}
+
+        if ! echo "${DOCKER_REGISTRY}" | grep -q '/$'; then
+          DOCKER_REGISTRY="${DOCKER_REGISTRY}/"
+        fi
+
+        IMAGE_TAG="${DOCKER_REGISTRY}${DOCKER_REPOSITORY}:${DOCKER_IMAGE_VERSION}"
+        echo "::set-output name=image_tag::${IMAGE_TAG}"
