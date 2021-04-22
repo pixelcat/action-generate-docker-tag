@@ -21,6 +21,7 @@ runs:
   using: composite
   steps:
     - name: "Configure docker image tag"
+      id: generate-docker-tag
       shell: bash
       run: |
         DOCKER_IMAGE_VERSION=
@@ -43,4 +44,4 @@ runs:
 
         IMAGE_TAG="${DOCKER_REGISTRY}${DOCKER_REPOSITORY}:${DOCKER_IMAGE_VERSION}"
         echo "Setting image tag: ${IMAGE_TAG}"
-        echo "::set-output name=image-tag::${IMAGE_TAG}"
+        echo "::set-output name=image-tag::$(echo ${IMAGE_TAG})"
