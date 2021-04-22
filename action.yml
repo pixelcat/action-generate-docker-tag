@@ -13,7 +13,7 @@ inputs:
     description: "The name of the docker repository to generate against"
     required: true
 outputs:
-  image_tag:
+  image-tag:
     description: "The image tag to build"
     value: ""
 
@@ -24,7 +24,9 @@ runs:
       shell: bash
       run: |
         DOCKER_IMAGE_VERSION=
-        RELEASE_VER=${GITHUB_REF}
+        RELEASE_VER="${{ inputs.git-ref }}"
+        DOCKER_REGISTRY="${{ inputs.docker-registry }}"
+        DOCKER_REPOSITORY="${{ inputs.docker-repository }}"
 
         if [[ "x${RELEASE_VER}" != "x" ]]; then
           if [[ "x${RELEASE_VER}" == "xmain" ]]; then
@@ -40,4 +42,5 @@ runs:
         fi
 
         IMAGE_TAG="${DOCKER_REGISTRY}${DOCKER_REPOSITORY}:${DOCKER_IMAGE_VERSION}"
-        echo "::set-output name=image_tag::${IMAGE_TAG}"
+        echo "Setting image tag: ${IMAGE_TAG}"
+        echo "::set-output name=image-tag::${IMAGE_TAG}"
