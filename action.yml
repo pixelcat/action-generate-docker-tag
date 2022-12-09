@@ -43,4 +43,4 @@ runs:
         fi
 
         IMAGE_TAG="${DOCKER_REGISTRY}${DOCKER_REPOSITORY}:${DOCKER_IMAGE_VERSION}"
-        echo ::set-output name=image-tag::$(echo ${IMAGE_TAG})
+        echo "image-tag=$(echo ${IMAGE_TAG})" >> ${GITHUB_OUTPUT}
